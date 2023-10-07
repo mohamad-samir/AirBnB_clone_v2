@@ -60,7 +60,11 @@ file { '/data/web_static/current':
 # Update Nginx configuration
 file { '/etc/nginx/sites-available/default':
   ensure  => 'file',
-  content => "server {\n    listen 80;\n    server_name _;\n    location /hbnb_static {\n        alias /data/web_static/current;\n    }\n}\n",
+  content => "server {\n
+  listen 80;\n
+  server_name _;\n
+  location /hbnb_static {\n
+  alias /data/web_static/current;\n}\n}\n",
   notify  => Service['nginx'],
 }
 
