@@ -1,28 +1,28 @@
 #!/usr/bin/python3
 # Fabfile to delete out-of-date archives.
-import os
-from fabric.api import *
+
+from fabric.api import env, run
+from fabric.operations import sudo
 
 env.hosts = ["54.160.85.72", "35.175.132.106"]
 
-
 def do_clean(number=0):
-    """Delete out-of-date archives.
-    Args:
-        number (int): The number of archives to keep.
-    If number is 0 or 1, keeps only the most recent archive. If
-    number is 2, keeps the most and second-most recent archives,
-    etc.
-    """
-    number = 1 if int(number) == 0 else int(number)
+    number = int(number)
 
-    archives = sorted(os.listdir("versions"))
-    [archives.pop() for i in range(number)]
-    with lcd("versions"):
-        [local("rm ./{}".format(a)) for a in archives]
+    # Ensure we keep at least one version
+    if number == 0:
+        number = 1
 
-    with cd("/data/web_static/releases"):
-        archives = run("ls -tr").split()
-        archives = [a for a in archives if "web_static_" in a]
-        [archives.pop() for i in range(number)]
-        [run("rm -rf ./{}".format(a)) for a in archives]
+    # Delete files in versions
+    versions_files = sorted(run('ls -tr versions').split())
+    if len(versions_files) > number:
+        del versions_files[-number:]  # Leave the last 'number' of files
+        for outdated_file in versions_files:
+            sudo('rm versions/{}'.format(outdated_file))
+
+    # Delete files in /data/web_static/releases
+    releases_files = sorted(run('ls -tr /data/web_static/releases').split())
+    if len(releases_files) > number:
+        del releases_files[-number:]  # Leave the last 'number' of files
+        for outdated_file in releases_files:
+            sudo('rm -rf /data/web_static/releases/{}'.format(outdated_file))
