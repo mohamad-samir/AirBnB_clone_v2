@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 
 @app.teardown_appcontext
-def appcontext_teardown(exception):
+def appcontext_teardown(self):
     """use storage for fetching data from the storage engine
     """
     storage.close()
