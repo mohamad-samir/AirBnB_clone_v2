@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 
 @app.teardown_appcontext
-def appcontext_teardown(self):
+def appcontext_teardown(exception):
     """use storage for fetching data from the storage engine
     """
     storage.close()
@@ -26,5 +26,3 @@ def state_info():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
-
-
